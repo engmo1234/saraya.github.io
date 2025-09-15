@@ -2,49 +2,557 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>عرض ثلاثي الأبعاد</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معرض صور سارايا | Saraya.vip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      background-color: #000;
-      color: #fff;
-      font-family: 'Cairo', sans-serif;
+    :root {
+      --primary-brown: #3A2D28;
+      --dark-brown: #2A211D;
+      --light-brown: #5C4B43;
+      --accent-brown: #8C735B;
+      --dark-grey: #2C2C2C;
+      --medium-grey: #3E3E3E;
+      --light-grey: #6E6E6E;
+      --text-color: #E8E8E8;
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+    
+    body {
+      background: linear-gradient(to bottom, var(--dark-brown), var(--dark-grey));
+      color: var(--text-color);
+      font-family: 'Cairo', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    header {
+      padding: 30px 0;
       text-align: center;
+      position: relative;
+      background: rgba(42, 33, 29, 0.8);
+      border-bottom: 1px solid var(--accent-brown);
+      margin-bottom: 40px;
     }
-    h1 {
-      margin-top: 40px;
-    }
-    .gallery {
+    
+    .logo {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      font-size: 24px;
+      color: var(--accent-brown);
+      font-weight: 700;
+      text-decoration: none;
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .logo i {
+      margin-right: 8px;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: var(--accent-brown);
+      font-weight: 700;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    .subtitle {
+      color: var(--light-grey);
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+    
+    .filter-buttons {
+      display: flex;
       justify-content: center;
-      gap: 30px;
-      padding: 40px;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
     }
+    
+    .filter-btn {
+      background: var(--medium-grey);
+      color: var(--text-color);
+      border: none;
+      padding: 8px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Cairo', sans-serif;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent-brown);
+    }
+    
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      padding: 20px;
+    }
+    
     .card {
-      background: #111;
-      padding: 15px;
-      border-radius: 10px;
-      transition: transform 0.5s, box-shadow 0.5s;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      background: var(--dark-brown);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      border: 1px solid var(--light-brown);
     }
+    
     .card:hover {
-      transform: scale(1.05) rotateY(5deg);
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(140, 115, 91, 0.3);
     }
-    .card img {
-      width: 300px;
+    
+    .card-img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      display: block;
+      transition: var(--transition);
+    }
+    
+    .card:hover .card-img {
+      transform: scale(1.05);
+    }
+    
+    .card-caption {
+      padding: 15px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #ccc;
+      background: var(--light-brown);
+    }
+    
+    /* Lightbox Styles */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(42, 33, 29, 0.98);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .lightbox.open {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 90%;
+      margin: 0 auto;
+      position: relative;
+    }
+    
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 90vh;
       border-radius: 8px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+      border: 2px solid var(--accent-brown);
+    }
+    
+    .lightbox-caption {
+      text-align: center;
+      padding: 15px;
+      color: var(--text-color);
+      font-size: 1.2rem;
+      background: var(--dark-brown);
+      border-radius: 0 0 8px 8px;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      font-size: 30px;
+      color: var(--text-color);
+      background: var(--dark-brown);
+      border: 1px solid var(--accent-brown);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 1001;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .close-btn:hover {
+      color: var(--accent-brown);
+      transform: rotate(90deg);
+    }
+    
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 30px;
+      color: var(--text-color);
+      background: var(--dark-brown);
+      border: 1px solid var(--accent-brown);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .nav-btn:hover {
+      background: var(--accent-brown);
+    }
+    
+    .prev-btn {
+      left: 30px;
+    }
+    
+    .next-btn {
+      right: 30px;
+    }
+    
+    /* Loading animation */
+    .loader {
+      display: flex;
+      justify-content: center;
+      margin: 40px 0;
+    }
+    
+    .loader-dot {
+      width: 12px;
+      height: 12px;
+      margin: 0 5px;
+      background-color: var(--accent-brown);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    
+    .loader-dot:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    
+    .loader-dot:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+        padding: 10px;
+      }
+      
+      .card-img {
+        height: 200px;
+      }
+      
+      .nav-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+      }
+      
+      .prev-btn {
+        left: 10px;
+      }
+      
+      .next-btn {
+        right: 10px;
+      }
+      
+      .close-btn {
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+      
+      .logo {
+        position: relative;
+        left: 0;
+        top: 0;
+        margin-bottom: 15px;
+        justify-content: center;
+      }
+      
+      header {
+        padding: 20px 0;
+      }
+    }
+    
+    /* Animation for cards */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: var(--light-grey);
+      border-top: 1px solid var(--light-brown);
     }
   </style>
 </head>
 <body>
-  <h1>معرض التصميمات</h1>
-  <div class="gallery">
-    <div class="card"><img src="Screenshot 2025-04-29 141950.png" alt="مشروع 1"></div>
-    <div class="card"><img src="Screenshot 2025-04-29 142030.png" alt="مشروع 2"></div>
-    <div class="card"><img src="Screenshot 2025-04-29 142147.png" alt="مشروع 3"></div>
+  <div class="container">
+    <header>
+      <a href="#" class="logo"><i class="fas fa-arrow-left"></i> العودة للرئيسية</a>
+      <h1>معرض تصاميم سارايا</h1>
+      <p class="subtitle">أحدث أعمالنا وتصميماتنا المميزة</p>
+    </header>
+    
+    <div class="filter-buttons">
+      <button class="filter-btn active">الكل</button>
+      <button class="filter-btn">أحدث التصاميم</button>
+      <button class="filter-btn">أعمال مختارة</button>
+      <button class="filter-btn">أفكار إبداعية</button>
+    </div>
+    
+    <div class="gallery">
+      <!-- Original Images -->
+      <div class="card fade-in">
+        <img src="Screenshot 2025-04-29 141950.png" alt="مشروع 1" class="card-img">
+        <div class="card-caption">مشروع 1 - تصميم مبتكر</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-04-29 142030.png" alt="مشروع 2" class="card-img">
+        <div class="card-caption">مشروع 2 - حلول إبداعية</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-04-29 142147.png" alt="مشروع 3" class="card-img">
+        <div class="card-caption">مشروع 3 - رؤية فريدة</div>
+      </div>
+      
+      <!-- Newly Uploaded Images -->
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 121336.png" alt="مشروع جديد 1" class="card-img">
+        <div class="card-caption">تصميم حديث - سبتمبر 2025</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 121549.png" alt="مشروع جديد 2" class="card-img">
+        <div class="card-caption">أحدث أعمالنا - سبتمبر 2025</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 121637.png" alt="مشروع جديد 3" class="card-img">
+        <div class="card-caption">إبداع جديد - سبتمبر 2025</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 121808.png" alt="مشروع جديد 4" class="card-img">
+        <div class="card-caption">تطوير حديث - سبتمبر 2025</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 121840.png" alt="مشروع جديد 5" class="card-img">
+        <div class="card-caption">رؤية جديدة - سبتمبر 2025</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 121934.png" alt="مشروع جديد 6" class="card-img">
+        <div class="card-caption">ابتكار متميز - سبتمبر 2025</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 122024.png" alt="مشروع جديد 7" class="card-img">
+        <div class="card-caption">تميز في التصميم - سبتمبر 2025</div>
+      </div>
+      <div class="card fade-in">
+        <img src="Screenshot 2025-09-15 122059.png" alt="مشروع جديد 8" class="card-img">
+        <div class="card-caption">إبداع خالص - سبتمبر 2025</div>
+      </div>
+    </div>
+    
+    <div class="loader">
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
+    </div>
   </div>
+  
+  <!-- Lightbox -->
+  <div class="lightbox">
+    <button class="close-btn"><i class="fas fa-times"></i></button>
+    <button class="nav-btn prev-btn"><i class="fas fa-chevron-right"></i></button>
+    <button class="nav-btn next-btn"><i class="fas fa-chevron-left"></i></button>
+    <div class="lightbox-content">
+      <img src="" alt="" class="lightbox-img">
+      <div class="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 سارايا - جميع الحقوق محفوظة</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Lightbox functionality
+      const cards = document.querySelectorAll('.card');
+      const lightbox = document.querySelector('.lightbox');
+      const lightboxImg = document.querySelector('.lightbox-img');
+      const lightboxCaption = document.querySelector('.lightbox-caption');
+      const closeBtn = document.querySelector('.close-btn');
+      const prevBtn = document.querySelector('.prev-btn');
+      const nextBtn = document.querySelector('.next-btn');
+      const loader = document.querySelector('.loader');
+      
+      let currentIndex = 0;
+      const images = Array.from(cards).map(card => {
+        return {
+          src: card.querySelector('img').src,
+          alt: card.querySelector('img').alt,
+          caption: card.querySelector('.card-caption').textContent
+        };
+      });
+      
+      // Hide loader when page is fully loaded
+      window.addEventListener('load', function() {
+        loader.style.display = 'none';
+      });
+      
+      // Open lightbox
+      function openLightbox(index) {
+        currentIndex = index;
+        updateLightbox();
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+      }
+      
+      // Update lightbox content
+      function updateLightbox() {
+        const image = images[currentIndex];
+        lightboxImg.src = image.src;
+        lightboxImg.alt = image.alt;
+        lightboxCaption.textContent = image.caption;
+      }
+      
+      // Close lightbox
+      function closeLightbox() {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = ''; // Enable scrolling
+      }
+      
+      // Navigate to next image
+      function nextImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        updateLightbox();
+      }
+      
+      // Navigate to previous image
+      function prevImage() {
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        updateLightbox();
+      }
+      
+      // Event listeners
+      cards.forEach((card, index) => {
+        card.addEventListener('click', () => openLightbox(index));
+      });
+      
+      closeBtn.addEventListener('click', closeLightbox);
+      nextBtn.addEventListener('click', nextImage);
+      prevBtn.addEventListener('click', prevImage);
+      
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('open')) return;
+        
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'ArrowLeft') prevImage();
+      });
+      
+      // Close lightbox when clicking outside image
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      
+      // Filter buttons functionality
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          // Here you would typically filter the gallery
+        });
+      });
+      
+      // Lazy loading for images
+      if ('IntersectionObserver' in window) {
+        const lazyImageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const lazyImage = entry.target;
+              lazyImage.style.animationDelay = `${Math.random() * 0.5}s`;
+              lazyImageObserver.unobserve(lazyImage);
+            }
+          });
+        });
+        
+        document.querySelectorAll('.card').forEach(card => {
+          lazyImageObserver.observe(card);
+        });
+      }
+    });
+  </script>
 </body>
 </html>
