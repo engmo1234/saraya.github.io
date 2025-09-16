@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="htmlElement">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,6 +65,24 @@
     
     .logo i {
       margin-right: 8px;
+    }
+    
+    .language-toggle {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: var(--medium-grey);
+      color: var(--text-color);
+      border: 1px solid var(--accent-brown);
+      padding: 8px 15px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Cairo', sans-serif;
+    }
+    
+    .language-toggle:hover {
+      background: var(--accent-brown);
     }
     
     h1 {
@@ -331,6 +349,13 @@
         justify-content: center;
       }
       
+      .language-toggle {
+        position: relative;
+        right: 0;
+        top: 0;
+        margin: 10px auto;
+      }
+      
       header {
         padding: 20px 0;
       }
@@ -358,16 +383,18 @@
 </head>
 <body>
   <div class="container">
-   <header>
-  <a href="https://www.saraya.vip" class="logo"><i class="fas fa-arrow-left"></i> العودة للرئيسية</a>
-  <h1>معرض تصاميم سارايا</h1>
-  <p class="subtitle">أحدث أعمالنا وتصميماتنا المميزة</p>
-   </header>
+    <header>
+      <a href="https://www.saraya.vip" class="logo"><i class="fas fa-arrow-left"></i> <span class="back-text">العودة للرئيسية</span></a>
+      <button class="language-toggle" id="languageToggle">English</button>
+      <h1 class="main-title">معرض تصاميم سارايا</h1>
+      <p class="subtitle">أحدث أعمالنا وتصميماتنا المميزة</p>
+    </header>
+    
     <div class="filter-buttons">
-      <button class="filter-btn active">الكل</button>
-      <button class="filter-btn">أحدث التصاميم</button>
-      <button class="filter-btn">أعمال مختارة</button>
-      <button class="filter-btn">أفكار إبداعية</button>
+      <button class="filter-btn active" data-filter="all"><span class="filter-text">الكل</span></button>
+      <button class="filter-btn" data-filter="new"><span class="filter-text">أحدث التصاميم</span></button>
+      <button class="filter-btn" data-filter="featured"><span class="filter-text">أعمال مختارة</span></button>
+      <button class="filter-btn" data-filter="creative"><span class="filter-text">أفكار إبداعية</span></button>
     </div>
     
     <div class="gallery">
@@ -439,11 +466,119 @@
   </div>
 
   <footer>
-    <p>© 2025 سارايا - جميع الحقوق محفوظة</p>
+    <p class="footer-text">© 2025 سارايا - جميع الحقوق محفوظة</p>
   </footer>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Language toggle functionality
+      const languageToggle = document.getElementById('languageToggle');
+      const htmlElement = document.getElementById('htmlElement');
+      let isEnglish = false;
+      
+      // English translations
+      const translations = {
+        back: "Back to Home",
+        title: "Saraya Designs Gallery",
+        subtitle: "Our latest works and distinctive designs",
+        all: "All",
+        new: "Latest Designs",
+        featured: "Featured Works",
+        creative: "Creative Ideas",
+        footer: "© 2025 Saraya - All rights reserved",
+        project1: "Project 1 - Innovative Design",
+        project2: "Project 2 - Creative Solutions",
+        project3: "Project 3 - Unique Vision",
+        projectNew1: "Modern Design - September 2025",
+        projectNew2: "Our Latest Work - September 2025",
+        projectNew3: "New Creativity - September 2025",
+        projectNew4: "Modern Development - September 2025",
+        projectNew5: "New Vision - September 2025",
+        projectNew6: "Distinguished Innovation - September 2025",
+        projectNew7: "Design Excellence - September 2025",
+        projectNew8: "Pure Creativity - September 2025"
+      };
+      
+      // Toggle language function
+      function toggleLanguage() {
+        isEnglish = !isEnglish;
+        
+        if (isEnglish) {
+          // Switch to English
+          htmlElement.lang = "en";
+          htmlElement.dir = "ltr";
+          languageToggle.textContent = "العربية";
+          
+          // Update all text content
+          document.querySelector('.back-text').textContent = translations.back;
+          document.querySelector('.main-title').textContent = translations.title;
+          document.querySelector('.subtitle').textContent = translations.subtitle;
+          document.querySelector('.footer-text').textContent = translations.footer;
+          
+          // Update filter buttons
+          document.querySelector('[data-filter="all"] .filter-text').textContent = translations.all;
+          document.querySelector('[data-filter="new"] .filter-text').textContent = translations.new;
+          document.querySelector('[data-filter="featured"] .filter-text').textContent = translations.featured;
+          document.querySelector('[data-filter="creative"] .filter-text').textContent = translations.creative;
+          
+          // Update card captions
+          const captions = document.querySelectorAll('.card-caption');
+          captions[0].textContent = translations.project1;
+          captions[1].textContent = translations.project2;
+          captions[2].textContent = translations.project3;
+          captions[3].textContent = translations.projectNew1;
+          captions[4].textContent = translations.projectNew2;
+          captions[5].textContent = translations.projectNew3;
+          captions[6].textContent = translations.projectNew4;
+          captions[7].textContent = translations.projectNew5;
+          captions[8].textContent = translations.projectNew6;
+          captions[9].textContent = translations.projectNew7;
+          captions[10].textContent = translations.projectNew8;
+          
+          // Adjust logo position for LTR
+          document.querySelector('.logo').style.left = 'auto';
+          document.querySelector('.logo').style.right = '20px';
+        } else {
+          // Switch to Arabic
+          htmlElement.lang = "ar";
+          htmlElement.dir = "rtl";
+          languageToggle.textContent = "English";
+          
+          // Restore original Arabic text
+          document.querySelector('.back-text').textContent = "العودة للرئيسية";
+          document.querySelector('.main-title').textContent = "معرض تصاميم سارايا";
+          document.querySelector('.subtitle').textContent = "أحدث أعمالنا وتصميماتنا المميزة";
+          document.querySelector('.footer-text').textContent = "© 2025 سارايا - جميع الحقوق محفوظة";
+          
+          // Restore filter buttons
+          document.querySelector('[data-filter="all"] .filter-text').textContent = "الكل";
+          document.querySelector('[data-filter="new"] .filter-text').textContent = "أحدث التصاميم";
+          document.querySelector('[data-filter="featured"] .filter-text').textContent = "أعمال مختارة";
+          document.querySelector('[data-filter="creative"] .filter-text').textContent = "أفكار إبداعية";
+          
+          // Restore card captions
+          const captions = document.querySelectorAll('.card-caption');
+          captions[0].textContent = "مشروع 1 - تصميم مبتكر";
+          captions[1].textContent = "مشروع 2 - حلول إبداعية";
+          captions[2].textContent = "مشروع 3 - رؤية فريدة";
+          captions[3].textContent = "تصميم حديث - سبتمبر 2025";
+          captions[4].textContent = "أحدث أعمالنا - سبتمبر 2025";
+          captions[5].textContent = "إبداع جديد - سبتمبر 2025";
+          captions[6].textContent = "تطوير حديث - سبتمبر 2025";
+          captions[7].textContent = "رؤية جديدة - سبتمبر 2025";
+          captions[8].textContent = "ابتكار متميز - سبتمبر 2025";
+          captions[9].textContent = "تميز في التصميم - سبتمبر 2025";
+          captions[10].textContent = "إبداع خالص - سبتمبر 2025";
+          
+          // Adjust logo position for RTL
+          document.querySelector('.logo').style.right = 'auto';
+          document.querySelector('.logo').style.left = '20px';
+        }
+      }
+      
+      // Add event listener to language toggle button
+      languageToggle.addEventListener('click', toggleLanguage);
+      
       // Lightbox functionality
       const cards = document.querySelectorAll('.card');
       const lightbox = document.querySelector('.lightbox');
