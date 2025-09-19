@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="utf-8"/>
@@ -43,6 +42,10 @@
 @keyframes rotate {
 0% { transform: rotateY(0deg); }
 100% { transform: rotateY(360deg); }
+}
+@keyframes slideIn {
+0% { opacity: 0; transform: translateY(-20px); }
+100% { opacity: 1; transform: translateY(0); }
 }
 .floating {
 animation: float 6s ease-in-out infinite;
@@ -115,7 +118,199 @@ text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%);
 }
 
-.arabic * { unicode-bidi: plaintext; direction: rtl; } .arabic span.number, .arabic .number { direction: ltr; display: inline-block; }</style>
+.arabic * { unicode-bidi: plaintext; direction: rtl; } .arabic span.number, .arabic .number { direction: ltr; display: inline-block; }
+
+/* Menu Styles */
+.menu-container {
+position: relative;
+}
+
+.menu-button {
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+width: 44px;
+height: 44px;
+border-radius: 8px;
+background: #3E2723;
+color: white;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+background: #5D4037;
+transform: scale(1.05);
+}
+
+.menu-button span {
+display: block;
+width: 24px;
+height: 2px;
+background: white;
+margin: 2px 0;
+transition: all 0.3s ease;
+transform-origin: center;
+}
+
+.menu-button.active span:nth-child(1) {
+transform: translateY(6px) rotate(45deg);
+}
+
+.menu-button.active span:nth-child(2) {
+opacity: 0;
+}
+
+.menu-button.active span:nth-child(3) {
+transform: translateY(-6px) rotate(-45deg);
+}
+
+.menu-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.8);
+backdrop-filter: blur(5px);
+z-index: 9998;
+opacity: 0;
+visibility: hidden;
+transition: all 0.3s ease;
+}
+
+.menu-overlay.active {
+opacity: 1;
+visibility: visible;
+}
+
+.menu-content {
+position: fixed;
+top: 0;
+right: 0;
+width: 320px;
+height: 100%;
+background: white;
+z-index: 9999;
+padding: 80px 30px 30px;
+transform: translateX(100%);
+transition: transform 0.4s ease;
+overflow-y: auto;
+box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+}
+
+.menu-content.active {
+transform: translateX(0);
+}
+
+.menu-close {
+position: absolute;
+top: 20px;
+left: 20px;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+background: #f5f5f5;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.menu-close:hover {
+background: #e0e0e0;
+transform: rotate(90deg);
+}
+
+.menu-close i {
+font-size: 24px;
+color: #333;
+}
+
+.menu-list {
+list-style: none;
+padding: 0;
+margin: 0;
+}
+
+.menu-item {
+margin-bottom: 15px;
+border-bottom: 1px solid #f0f0f0;
+padding-bottom: 15px;
+}
+
+.menu-item:last-child {
+border-bottom: none;
+margin-bottom: 0;
+padding-bottom: 0;
+}
+
+.menu-link {
+display: flex;
+align-items: center;
+padding: 12px 15px;
+border-radius: 8px;
+color: #333;
+text-decoration: none;
+font-weight: 600;
+font-size: 18px;
+transition: all 0.3s ease;
+background: #f9f9f9;
+}
+
+.menu-link:hover {
+background: #3E2723;
+color: white;
+transform: translateX(-5px);
+}
+
+.menu-link i {
+margin-left: 10px;
+font-size: 20px;
+}
+
+.menu-link.arabic {
+direction: rtl;
+font-family: 'Cairo', sans-serif;
+}
+
+.menu-link.arabic i {
+margin-left: 0;
+margin-right: 10px;
+}
+
+.menu-language {
+display: flex;
+justify-content: center;
+margin-top: 30px;
+padding-top: 20px;
+border-top: 1px solid #eee;
+}
+
+.lang-btn {
+padding: 8px 16px;
+border-radius: 20px;
+background: #f0f0f0;
+border: none;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+margin: 0 5px;
+}
+
+.lang-btn.active {
+background: #3E2723;
+color: white;
+}
+
+@media (max-width: 768px) {
+.menu-content {
+width: 280px;
+}
+}
+</style>
 </head>
 <body class="bg-gray-50 overflow-x-hidden">
 <div class="custom-cursor hidden md:block" id="custom-cursor"></div>
@@ -140,6 +335,14 @@ background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba
 </div>
 </div>
 <div class="flex items-center space-x-6">
+<!-- Menu Button -->
+<div class="menu-container">
+<button class="menu-button" id="menu-toggle">
+<span></span>
+<span></span>
+<span></span>
+</button>
+</div>
 <button class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors !rounded-button" id="language-toggle">
 <i class="ri-translate-2-line text-secondary ri-lg"></i>
 </button>
@@ -151,6 +354,81 @@ background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba
 </div>
 </div>
 </header>
+
+<!-- Menu Overlay -->
+<div class="menu-overlay" id="menu-overlay"></div>
+<div class="menu-content" id="menu-content">
+<div class="menu-close" id="menu-close">
+<i class="ri-close-line"></i>
+</div>
+<ul class="menu-list">
+<li class="menu-item">
+<a href="#" class="menu-link english hidden">
+<i class="ri-home-line"></i>
+Home
+</a>
+<a href="#" class="menu-link arabic">
+<i class="ri-home-line"></i>
+الرئيسية
+</a>
+</li>
+<li class="menu-item">
+<a href="#services" class="menu-link english hidden">
+<i class="ri-service-line"></i>
+Services
+</a>
+<a href="#services" class="menu-link arabic">
+<i class="ri-service-line"></i>
+الخدمات
+</a>
+</li>
+<li class="menu-item">
+<a href="#testimonials" class="menu-link english hidden">
+<i class="ri-feedback-line"></i>
+Testimonials
+</a>
+<a href="#testimonials" class="menu-link arabic">
+<i class="ri-feedback-line"></i>
+آراء العملاء
+</a>
+</li>
+<li class="menu-item">
+<a href="https://www.saraya.vip/3d_gallery" class="menu-link english hidden">
+<i class="ri-landscape-line"></i>
+3D Gallery
+</a>
+<a href="https://www.saraya.vip/3d_gallery" class="menu-link arabic">
+<i class="ri-landscape-line"></i>
+المعرض ثلاثي الأبعاد
+</a>
+</li>
+<li class="menu-item">
+<a href="https://forms.zohopublic.com/sarayaengineeringconsultancy/form/Untitled/formperma/5K3NJSCuPu8Py2nMUfTiEdc-tzpNG40xUPTbHJV0ro0?fbclid=PAZXh0bgNhZW0CMTEAAacb7y6M0Oon_1PV6kB_nA_GUWWIueIno07TZVPbLmaa6WTCCxmq2iYm0eS1Tg_aem_Qwyy9QudTxajW8CNXWbQJg" class="menu-link english hidden">
+<i class="ri-file-list-3-line"></i>
+Contact Form
+</a>
+<a href="https://forms.zohopublic.com/sarayaengineeringconsultancy/form/Untitled/formperma/5K3NJSCuPu8Py2nMUfTiEdc-tzpNG40xUPTbHJV0ro0?fbclid=PAZXh0bgNhZW0CMTEAAacb7y6M0Oon_1PV6kB_nA_GUWWIueIno07TZVPbLmaa6WTCCxmq2iYm0eS1Tg_aem_Qwyy9QudTxajW8CNXWbQJg" class="menu-link arabic">
+<i class="ri-file-list-3-line"></i>
+نموذج الاتصال
+</a>
+</li>
+<li class="menu-item">
+<a href="#footer" class="menu-link english hidden">
+<i class="ri-contacts-line"></i>
+Contact Info
+</a>
+<a href="#footer" class="menu-link arabic">
+<i class="ri-contacts-line"></i>
+معلومات الاتصال
+</a>
+</li>
+</ul>
+<div class="menu-language">
+<button class="lang-btn active" data-lang="ar">العربية</button>
+<button class="lang-btn" data-lang="en">English</button>
+</div>
+</div>
+
 <main>
 <!-- Hero Section -->
 <section class="relative min-h-screen pt-20 overflow-hidden">
@@ -274,7 +552,7 @@ With over 25 years of experience, Saraya Engineering delivers world-class constr
 </div>
 </section>
 <!-- Testimonials Section -->
-<section class="py-16 bg-gray-50">
+<section class="py-16 bg-gray-50" id="testimonials">
 <div class="container mx-auto px-4">
 <div class="text-center mb-12">
 <h2 class="text-3xl md:text-4xl font-bold mb-4 english hidden">What Our Clients Say</h2>
@@ -439,7 +717,7 @@ With over 25 years of experience, Saraya Engineering delivers world-class constr
 </div>
 </section>
 <!-- Services Section -->
-<section class="py-16 bg-gray-50">
+<section class="py-16 bg-gray-50" id="services">
 <div class="container mx-auto px-4">
 <div class="text-center mb-12">
 <h2 class="text-3xl md:text-4xl font-bold mb-4 english hidden">Our Comprehensive Services</h2>
@@ -525,7 +803,7 @@ With over 25 years of experience, Saraya Engineering delivers world-class constr
 </div>
 </section>
 </main>
-<footer class="bg-secondary text-white py-12">
+<footer class="bg-secondary text-white py-12" id="footer">
 <div class="container mx-auto px-4">
 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 <div>
@@ -586,7 +864,7 @@ With over 25 years of experience, Saraya Engineering delivers world-class constr
 </ul>
 <ul class="space-y-2 arabic">
 <li class="flex items-center justify-end">
-<span>أبوظبي، الإمارات العربية المتحدة</span>
+<span>أبوظби، الإمارات العربية المتحدة</span>
 <i class="ri-map-pin-line ml-2"></i>
 </li>
 <li class="flex items-center justify-end">
@@ -689,6 +967,44 @@ layer.style.transform = `translate(${moveX}px, ${moveY}px)`;
 const languageToggle = document.getElementById('language-toggle');
 if (languageToggle) {
 languageToggle.addEventListener('click', function() {
+toggleLanguage();
+});
+}
+// Menu functionality
+const menuToggle = document.getElementById('menu-toggle');
+const menuOverlay = document.getElementById('menu-overlay');
+const menuContent = document.getElementById('menu-content');
+const menuClose = document.getElementById('menu-close');
+const langButtons = document.querySelectorAll('.lang-btn');
+function toggleMenu() {
+menuToggle.classList.toggle('active');
+menuOverlay.classList.toggle('active');
+menuContent.classList.toggle('active');
+document.body.style.overflow = menuContent.classList.contains('active') ? 'hidden' : '';
+}
+menuToggle.addEventListener('click', toggleMenu);
+menuOverlay.addEventListener('click', toggleMenu);
+menuClose.addEventListener('click', toggleMenu);
+// Menu language buttons
+langButtons.forEach(btn => {
+btn.addEventListener('click', function() {
+const lang = this.getAttribute('data-lang');
+langButtons.forEach(b => b.classList.remove('active'));
+this.classList.add('active');
+if (lang === 'en') {
+// Switch to English
+document.documentElement.setAttribute('dir', 'ltr');
+document.documentElement.setAttribute('lang', 'en');
+toggleLanguage();
+} else {
+// Switch to Arabic
+document.documentElement.setAttribute('dir', 'rtl');
+document.documentElement.setAttribute('lang', 'ar');
+toggleLanguage();
+}
+});
+});
+function toggleLanguage() {
 const englishElements = document.querySelectorAll('.english');
 const arabicElements = document.querySelectorAll('.arabic');
 englishElements.forEach(el => {
@@ -696,7 +1012,6 @@ el.classList.toggle('hidden');
 });
 arabicElements.forEach(el => {
 el.classList.toggle('hidden');
-});
 });
 }
 // 3D Scene with Three.js
@@ -743,5 +1058,25 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 }
 });
 </script>
-<div style="text-align:center; margin-top: 30px;"><a href="3d_gallery.html" style="font-size: 20px; text-decoration: none; color: #333; border: 2px solid #000; padding: 10px 20px; border-radius: 6px; background-color: #f0f0f0;">زيارة المعرض ثلاثي الأبعاد</a></div></body>
+<!-- 3D Gallery Link Section -->
+<section class="py-12 bg-gradient-to-b from-gray-50 to-white">
+  <div class="container mx-auto px-4 text-center">
+    <div class="max-w-lg mx-auto bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all">
+      <div class="w-16 h-16 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4 mx-auto">
+        <i class="ri-landscape-line text-primary ri-2x"></i>
+      </div>
+      <h3 class="text-xl font-bold mb-2 english hidden">Explore Our 3D Gallery</h3>
+      <h3 class="text-xl font-bold mb-2 arabic">استكشف معرضنا ثلاثي الأبعاد</h3>
+      <p class="text-gray-600 mb-6 english hidden">Experience our projects in immersive 3D</p>
+      <p class="text-gray-600 mb-6 arabic">جرب مشاريعنا بتجربة ثلاثية الأبعاد غامرة</p>
+      <a href="https://www.saraya.vip/3d_gallery" class="inline-block bg-primary text-white font-bold py-3 px-8 rounded-button shadow-lg hover:shadow-xl transition-all text-lg">
+        <span class="english hidden">View Gallery</span>
+        <span class="arabic">عرض المعرض</span>
+        <i class="ri-arrow-right-line ml-2 english hidden"></i>
+        <i class="ri-arrow-left-line mr-2 arabic"></i>
+      </a>
+    </div>
+  </div>
+</section>
+</body>
 </html>
